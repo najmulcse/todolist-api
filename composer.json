@@ -1,0 +1,17 @@
+{
+    "name": "najmul/todolist",
+    "type": "todolist",
+    "authors": [
+        {
+            "name": "Najmul Ahmed",
+            "email": "najmul2022@gmail.com"
+        }
+    ],
+    "require": {},
+
+    "autoload":{
+        "psr-4":{
+            "Wedevs\\TodoList\\": "src/APIs/"
+        }
+    }
+}

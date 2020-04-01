@@ -1,17 +1,19 @@
 {
-    "name": "najmul/todolist",
-    "type": "todolist",
+    "name": "najmulcse/todolist",
+    "type": "package",
+    "license": "MIT",
     "authors": [
         {
             "name": "Najmul Ahmed",
             "email": "najmul2022@gmail.com"
         }
     ],
-    "require": {},
-
-    "autoload":{
-        "psr-4":{
-            "Wedevs\\TodoList\\": "src/APIs/"
+    "require": {
+        "vlucas/phpdotenv": "^2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "NAJMULCSE\\TODOLIST\\": "src/"
         }
     }
 }

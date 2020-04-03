@@ -51,7 +51,9 @@ class TodoQueryHandler {
         try {
             $statement = $this->db->prepare($statement);
             $statement->bindParam(1, $id);
-            $statement->execute();
+            if(!$statement->execute()){
+              return false;
+            }
             $result = $statement->fetch(\PDO::FETCH_ASSOC);
             return $result;
         } catch (\PDOException $e) {

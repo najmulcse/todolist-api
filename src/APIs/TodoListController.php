@@ -80,7 +80,7 @@ class TodoListController {
 
     private function createTodo()
     {
-        $input = $_POST;
+        $input = (array) json_decode(file_get_contents('php://input'), true);
 
         if (! $this->validateTodo($input)) {
             return $this->unprocessableEntityResponse();
@@ -124,6 +124,7 @@ class TodoListController {
         }
         $this->todoQueryHandler->delete($id);
         $response['status_code'] = 200;
+        $response['message'] = "Deleted successfully.";
         $response['body'] = null;
         return $response;
     }
@@ -149,8 +150,8 @@ class TodoListController {
     private function notFoundResponse()
     {
         $response['status_code'] = 404;
-        $response['body'] = null;
         $response['message'] = "Not Found";
+        $response['body'] = null;
         return $response;
     }
     private function sendErrorResponse($message, $code)

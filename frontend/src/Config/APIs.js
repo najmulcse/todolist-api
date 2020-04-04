@@ -24,6 +24,7 @@ export const RESPONSE_STATUSE_CODE = {
 
 export const HEADERS = {
     Accept: 'application/json',
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
     'Access-Control-Allow-Origin': '*',
 }
 

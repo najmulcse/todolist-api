@@ -1,4 +1,5 @@
 import React from 'react';
+//import { Provider } from 'react-redux';
 import ReactDOM from 'react-dom';
 import TodoPage from './components/Todo';
 import * as serviceWorker from './serviceWorker';
@@ -6,9 +7,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 ReactDOM.render(
-  <React.StrictMode>
-   <TodoPage/>
-  </React.StrictMode>,
+  <TodoPage/>
+   ,
   document.getElementById('root')
 );
 

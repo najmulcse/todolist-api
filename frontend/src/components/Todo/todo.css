@@ -6,3 +6,25 @@
     height: 20px;
     width: 20px;
 }
+.active{
+    background-color: green;
+    
+    color:white;
+}
+.todo-header{
+    font-weight: 600;
+    color: #efa4a4;
+    letter-spacing: 1px;
+}
+.todo-title-input{
+    font-size: 19px;
+    padding-left: 2.5rem!important;
+}
+
+.title-input-dropdown{
+    position: absolute;
+    height: 25px;
+    width: auto;
+    top: 7%;
+    padding-left: 8px;
+}

@@ -89,11 +89,12 @@ class TodoListController {
     private function createTodo()
     {
         $input = (array) json_decode(file_get_contents('php://input'), true);
-
-        if (! $this->validateTodo($input)) {
+        $data = @$input['data'];
+        
+        if (! $this->validateTodo($data)) {
             return $this->unprocessableEntityResponse();
         }
-        $this->todoQueryHandler->insert($input);
+        $this->todoQueryHandler->insert($data);
         $response['status_code'] = 200;
         $response['data'] = null;
         $response['message'] = "Todo created successfully.";
@@ -103,16 +104,18 @@ class TodoListController {
     private function update()
     {
         $input = (array) json_decode(file_get_contents('php://input'), true);
-        $id = @$input['id'];
+        $data = @$input['data'];
+        $id = $data['id'];
         $result = $this->todoQueryHandler->find($id);
         
         if (! $result) {
             return $this->notFoundResponse();
         }
-        if (! $this->validateTodo($input)) {
+        if (! $this->validateTodo($data)) {
             return $this->unprocessableEntityResponse();
         }
-        $status = $this->todoQueryHandler->update($id, $input);
+        //print_r($data);die();
+        $status = $this->todoQueryHandler->update($id, $data);
         if(!$status){
             return $this->sendErrorResponse(422, "Updating failed.");
         }
@@ -124,14 +127,15 @@ class TodoListController {
     private function toggleStatus()
     {
         $input = (array) json_decode(file_get_contents('php://input'), true);
-        $id = @$input['id'];
-        $isCompleted = @$input['is_completed'];
+        $data = @$input['data'];
+        $id = $data['id'];
+        $isCompleted = $data['is_completed'];
         $result = $this->todoQueryHandler->find($id);
         
         if (! $result) {
             return $this->notFoundResponse();
         }
-        if (! $this->validateToggleData($input)) {
+        if (! $this->validateToggleData($data)) {
             return $this->unprocessableEntityResponse();
         }
         $status = $this->todoQueryHandler->toggleStatus($id, $isCompleted);
@@ -148,7 +152,9 @@ class TodoListController {
     {
         $input = (array) json_decode(file_get_contents('php://input'), true);
         $id = @$input['id'];
+        
         $result = $this->todoQueryHandler->find($id);
+    
         if (! $result) {
             return $this->notFoundResponse();
         }

@@ -94,9 +94,9 @@ class TodoListController {
         if (! $this->validateTodo($data)) {
             return $this->unprocessableEntityResponse();
         }
-        $this->todoQueryHandler->insert($data);
+        $insertedData['id'] = $this->todoQueryHandler->insert($data);
         $response['status_code'] = 200;
-        $response['data'] = null;
+        $response['data'] = $insertedData;
         $response['message'] = "Todo created successfully.";
         return $response;
     }

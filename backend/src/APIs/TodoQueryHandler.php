@@ -107,7 +107,7 @@ class TodoQueryHandler {
 
             // execute query
             if($statement->execute()){
-                return true;
+                return $this->db->lastInsertId();
             }
 
             return false;

@@ -1,13 +1,16 @@
 import React from 'react';
-//import { Provider } from 'react-redux';
+import { Provider } from 'react-redux';
 import ReactDOM from 'react-dom';
 import TodoPage from './components/Todo';
 import * as serviceWorker from './serviceWorker';
+import store from './Redux/Store'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 ReactDOM.render(
-  <TodoPage/>
+  <Provider store={store}>
+      <TodoPage/>
+   </Provider>
    ,
   document.getElementById('root')
 );

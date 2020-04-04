@@ -3,8 +3,8 @@ import { getTodos, toggleCompleteStatus, createTodos, deleteTodo, updateTodo } f
 import { RESPONSE_STATUSE_CODE } from '../../Config/APIs';
 import { Icons } from '../../Shared/Icons';
 import './todo.css';
-
-
+import { connect } from 'react-redux';
+import { lastTodoItem } from '../../Redux/Actions/TodoActions'
 class  TodoPage extends Component{
 
     constructor(props)
@@ -24,6 +24,7 @@ class  TodoPage extends Component{
                 title: ''
             },
         }
+
     }
     componentDidMount(){
         this.getAllList();
@@ -80,22 +81,31 @@ class  TodoPage extends Component{
         if(event.key === 'Enter' && this.state.title !=''){
            
            let id, { todos, allTodos, title } = this.state;
+
            if(allTodos.length){
             let lastItem = allTodos.slice(-1);
-             id = lastItem[0];
-           }else{
-               id = 1;
+            lastItem = lastItem[0];
+            
+            let newItem = {id: parseInt(lastItem.id) + 1, title: title, is_completed: 0};
+
+            allTodos.push(newItem)
+            this.setState({allTodos});
+            this.renderSelectedTodo();
            }
-          
-           let newItem = {id: id, title: title, is_completed: 0};
-         
-           allTodos.push(newItem)
-           this.renderSelectedTodo();
+        
            
            // calling create api 
            createTodos(title)
                 .then(response => {
-                        console.log(response);
+                    
+                    let  allTodos = [...this.state.allTodos ];
+                    if(!this.state.allTodos.length){
+                        let newItem = {id: response.data.data.id, title: title, is_completed: 0};
+                        allTodos.push(newItem);
+                        this.setState({allTodos});
+                        this.renderSelectedTodo();
+                    }
+                
                 })
                 .catch(error => {
 
@@ -151,10 +161,10 @@ class  TodoPage extends Component{
             countCompletedTodos: 0,
         });
         completedTodos.map( todo => {
-            
+           //console.log(todo.id)
             deleteTodo(todo.id)
                 .then(response => {
-                        console.log(response);
+                       // console.log(response);
                 }).catch(error => {
                     console.log(error);
                 })
@@ -192,7 +202,7 @@ class  TodoPage extends Component{
             
             updateTodo(id,title, isCompleted )
             .then( response => {
-                console.log(response);
+                //console.log(response);
             })
             .catch( error => {
                 console.log(error);
@@ -338,4 +348,8 @@ class  TodoPage extends Component{
     }
 }
 
-export default TodoPage;
+const mapStateToProps = state => ({
+    todo: state.todo
+});
+
+export default connect(mapStateToProps, { lastTodoItem })(TodoPage);

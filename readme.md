@@ -1,6 +1,6 @@
 ## Introduction
 
-This is TodoList singel page application. For frontend development i used ReactJs(javascript framework) and for backend API developement used PHP. Here database is used MySQL.  
+This is TodoList single page application. For frontend development i used ReactJs(javascript framework) and for backend API developement used PHP. Here database is used MySQL.  
 
 ## Installation process
 

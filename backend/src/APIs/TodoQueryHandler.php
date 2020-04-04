@@ -33,7 +33,7 @@ class TodoQueryHandler {
             $statement = $this->db->query($statement);
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
             return $result;
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             return false;
         }
     }
@@ -55,8 +55,10 @@ class TodoQueryHandler {
               return false;
             }
             $result = $statement->fetch(\PDO::FETCH_ASSOC);
+          
             return $result;
         } catch (\PDOException $e) {
+            
             return false;
         }
     }
@@ -70,7 +72,7 @@ class TodoQueryHandler {
             $sql ="CREATE TABLE IF NOT EXISTS ".$this->tableName."(
             id INT( 11 ) AUTO_INCREMENT PRIMARY KEY,
             title VARCHAR( 250 ) NOT NULL,
-            is_completed INT (2) DEFAULT (1), 
+            is_completed BOOLEAN  DEFAULT (0), 
             created_at DATE NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at DATE NOT NULL DEFAULT CURRENT_TIMESTAMP );" ;
 
@@ -137,6 +139,34 @@ class TodoQueryHandler {
             if(isset($input['is_completed'])){
                 $statement->bindParam(":is_completed", $input['is_completed']);
             }
+            $statement->bindParam(':id', $id);
+            // execute query
+            if($statement->execute()){
+                return true;
+            }
+
+            return false;
+
+        } catch (\PDOException $e) {
+            return false;
+        }
+    }
+
+    public function toggleStatus($id, $isCompleted)
+    {
+
+        $statement = "
+            UPDATE {$this->tableName}
+            SET 
+                is_completed  = :is_completed
+            WHERE id = :id;
+        ";
+
+        try {
+            $statement = $this->db->prepare($statement);
+          
+            $statement->bindParam(":is_completed", $isCompleted);
+            
             $statement->bindParam(':id', $id);
             // execute query
             if($statement->execute()){

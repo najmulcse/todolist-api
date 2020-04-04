@@ -46,6 +46,8 @@ class TodoListController {
             case 'PUT':
                 if($this->apiName == 'update'){
                     $response = $this->update();
+                }else if($this->apiName == 'toggleStatus'){
+                    $response = $this->toggleStatus();
                 }else{
                     $response = $this->notFoundResponse();
                 }
@@ -69,11 +71,17 @@ class TodoListController {
 
     private function getAllTodoList()
     {
-        $result = $this->todoQueryHandler->findAll();
-        $response['status_code'] = 200;
-        $response['message'] = "Data retrieved successfully.";
-        $response['body'] = $result;
-        return $response;
+        try{
+            $data = $this->todoQueryHandler->findAll();
+        
+            $result['todos'] = $data;
+            $response['status_code'] = 200;
+            $response['message'] = "Data retrieved successfully.";
+            $response['data'] = $result;
+            return $response;
+        }catch( \Exception $ex){
+            return $this->unprocessableEntityResponse();
+        }
     }
 
 
@@ -87,7 +95,7 @@ class TodoListController {
         }
         $this->todoQueryHandler->insert($input);
         $response['status_code'] = 200;
-        $response['body'] = null;
+        $response['data'] = null;
         $response['message'] = "Todo created successfully.";
         return $response;
     }
@@ -96,8 +104,8 @@ class TodoListController {
     {
         $input = (array) json_decode(file_get_contents('php://input'), true);
         $id = @$input['id'];
-
         $result = $this->todoQueryHandler->find($id);
+        
         if (! $result) {
             return $this->notFoundResponse();
         }
@@ -109,8 +117,30 @@ class TodoListController {
             return $this->sendErrorResponse(422, "Updating failed.");
         }
         $response['status_code'] = 200;
-        $response['body'] = null;
+        $response['data'] = null;
         $response['message'] = "Updated successfully.";
+        return $response;
+    }
+    private function toggleStatus()
+    {
+        $input = (array) json_decode(file_get_contents('php://input'), true);
+        $id = @$input['id'];
+        $isCompleted = @$input['is_completed'];
+        $result = $this->todoQueryHandler->find($id);
+        
+        if (! $result) {
+            return $this->notFoundResponse();
+        }
+        if (! $this->validateToggleData($input)) {
+            return $this->unprocessableEntityResponse();
+        }
+        $status = $this->todoQueryHandler->toggleStatus($id, $isCompleted);
+        if(!$status){
+            return $this->sendErrorResponse(422, "Updating failed.");
+        }
+        $response['status_code'] = 200;
+        $response['data'] = null;
+        $response['message'] = "Status updated successfully.";
         return $response;
     }
 
@@ -125,7 +155,7 @@ class TodoListController {
         $this->todoQueryHandler->delete($id);
         $response['status_code'] = 200;
         $response['message'] = "Deleted successfully.";
-        $response['body'] = null;
+        $response['data'] = null;
         return $response;
     }
 
@@ -138,10 +168,17 @@ class TodoListController {
         return true;
     }
 
+    private function validateToggleData($input){
+        if(!isset($input['is_completed'])){
+            return false;
+        }
+        return true;
+    }
+
     private function unprocessableEntityResponse()
     {
         $response['status_code'] = 422;
-        $response['body'] = [
+        $response['data'] = [
             'error' => 'Invalid input'
         ];
         return $response;
@@ -151,13 +188,13 @@ class TodoListController {
     {
         $response['status_code'] = 404;
         $response['message'] = "Not Found";
-        $response['body'] = null;
+        $response['data'] = null;
         return $response;
     }
     private function sendErrorResponse($message, $code)
     {
         $response['status_code'] = $code;
-        $response['body'] = null;
+        $response['data'] = null;
         $response['message'] = $message;
         return $response;
     }

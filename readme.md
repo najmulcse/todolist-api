@@ -10,9 +10,10 @@ This is TodoList single page application. For frontend development i used ReactJ
 Please follow the process to run backend.
 1. Create a databse (mySQL).
 2. Now Goto backend folder. 
-3. Open .env file, put your database name.( Example: DB_DATABASE=todo_api)  
-4. Now open a command prompt in backend folder.
-5. type 'php -S localhost:8090' and hit enter.
+3. run composer install
+4. Open .env file, put your database name.( Example: DB_DATABASE=todo_api)  
+5. Now open a command prompt in backend folder.
+6. type 'php -S localhost:8090' and hit enter.
 
 Note: Here 8090 port i used but you can change port as you want. If you change this port then you have to change API url in frontend part as well. 
 FileLocation: frontend/src/Config/APIs.js . 

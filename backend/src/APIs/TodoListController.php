@@ -46,6 +46,8 @@ class TodoListController {
             case 'PUT':
                 if($this->apiName == 'update'){
                     $response = $this->update();
+                }else if($this->apiName == 'toggleStatus'){
+                    $response = $this->toggleStatus();
                 }else{
                     $response = $this->notFoundResponse();
                 }
@@ -69,11 +71,17 @@ class TodoListController {
 
     private function getAllTodoList()
     {
-        $result = $this->todoQueryHandler->findAll();
-        $response['status_code'] = 200;
-        $response['message'] = "Data retrieved successfully.";
-        $response['body'] = $result;
-        return $response;
+        try{
+            $data = $this->todoQueryHandler->findAll();
+        
+            $result['todos'] = $data;
+            $response['status_code'] = 200;
+            $response['message'] = "Data retrieved successfully.";
+            $response['data'] = $result;
+            return $response;
+        }catch( \Exception $ex){
+            return $this->unprocessableEntityResponse();
+        }
     }
 
 
@@ -81,13 +89,14 @@ class TodoListController {
     private function createTodo()
     {
         $input = (array) json_decode(file_get_contents('php://input'), true);
-
-        if (! $this->validateTodo($input)) {
+        $data = @$input['data'];
+        
+        if (! $this->validateTodo($data)) {
             return $this->unprocessableEntityResponse();
         }
-        $this->todoQueryHandler->insert($input);
+        $insertedData['id'] = $this->todoQueryHandler->insert($data);
         $response['status_code'] = 200;
-        $response['body'] = null;
+        $response['data'] = $insertedData;
         $response['message'] = "Todo created successfully.";
         return $response;
     }
@@ -95,22 +104,47 @@ class TodoListController {
     private function update()
     {
         $input = (array) json_decode(file_get_contents('php://input'), true);
-        $id = @$input['id'];
-
+        $data = @$input['data'];
+        $id = $data['id'];
         $result = $this->todoQueryHandler->find($id);
+        
         if (! $result) {
             return $this->notFoundResponse();
         }
-        if (! $this->validateTodo($input)) {
+        if (! $this->validateTodo($data)) {
             return $this->unprocessableEntityResponse();
         }
-        $status = $this->todoQueryHandler->update($id, $input);
+        //print_r($data);die();
+        $status = $this->todoQueryHandler->update($id, $data);
         if(!$status){
             return $this->sendErrorResponse(422, "Updating failed.");
         }
         $response['status_code'] = 200;
-        $response['body'] = null;
+        $response['data'] = null;
         $response['message'] = "Updated successfully.";
+        return $response;
+    }
+    private function toggleStatus()
+    {
+        $input = (array) json_decode(file_get_contents('php://input'), true);
+        $data = @$input['data'];
+        $id = $data['id'];
+        $isCompleted = $data['is_completed'];
+        $result = $this->todoQueryHandler->find($id);
+        
+        if (! $result) {
+            return $this->notFoundResponse();
+        }
+        if (! $this->validateToggleData($data)) {
+            return $this->unprocessableEntityResponse();
+        }
+        $status = $this->todoQueryHandler->toggleStatus($id, $isCompleted);
+        if(!$status){
+            return $this->sendErrorResponse(422, "Updating failed.");
+        }
+        $response['status_code'] = 200;
+        $response['data'] = null;
+        $response['message'] = "Status updated successfully.";
         return $response;
     }
 
@@ -118,14 +152,16 @@ class TodoListController {
     {
         $input = (array) json_decode(file_get_contents('php://input'), true);
         $id = @$input['id'];
+        
         $result = $this->todoQueryHandler->find($id);
+    
         if (! $result) {
             return $this->notFoundResponse();
         }
         $this->todoQueryHandler->delete($id);
         $response['status_code'] = 200;
         $response['message'] = "Deleted successfully.";
-        $response['body'] = null;
+        $response['data'] = null;
         return $response;
     }
 
@@ -138,10 +174,17 @@ class TodoListController {
         return true;
     }
 
+    private function validateToggleData($input){
+        if(!isset($input['is_completed'])){
+            return false;
+        }
+        return true;
+    }
+
     private function unprocessableEntityResponse()
     {
         $response['status_code'] = 422;
-        $response['body'] = [
+        $response['data'] = [
             'error' => 'Invalid input'
         ];
         return $response;
@@ -151,13 +194,13 @@ class TodoListController {
     {
         $response['status_code'] = 404;
         $response['message'] = "Not Found";
-        $response['body'] = null;
+        $response['data'] = null;
         return $response;
     }
     private function sendErrorResponse($message, $code)
     {
         $response['status_code'] = $code;
-        $response['body'] = null;
+        $response['data'] = null;
         $response['message'] = $message;
         return $response;
     }

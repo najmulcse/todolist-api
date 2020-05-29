@@ -1,4 +1,5 @@
-const BASE_URL = "http://localhost:8090/api";
+const hostName = window.location.hostname;
+const BASE_URL = (hostName === 'localhost') ? `http://${hostName}:8000`: `https://${hostName}/todo-list/backend/api`;
 
 const VERSION = "/v1";
 const TODO = '/todo';
